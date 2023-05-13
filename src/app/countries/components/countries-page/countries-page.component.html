@@ -1,0 +1,5 @@
+<mat-toolbar color="primary">Countries</mat-toolbar>
+<app-countries-table
+  [data]="countries$ | async"
+  (reset)="reload()"
+/>
