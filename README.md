@@ -4,6 +4,8 @@ Generated with angular CLI
 
 Task description is here https://github.com/aidancr/challenge
 
+Pre requirements: Node 18, NPM 9
+
 How to start:
 
 ```bash
