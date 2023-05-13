@@ -1,29 +1,4 @@
-<mat-form-field appearance="outline" class="full-width">
-  <input [formControl]="form.controls.name" matInput (keyup)="applyFilter('name', form.controls.name.value)" placeholder="Search countries by name" />
-</mat-form-field>
-
-<mat-form-field appearance="outline">
-  <mat-select [formControl]="form.controls.subregion" (selectionChange)="applyFilter('subregion', $event.value)" [value]="''">
-    <mat-option [value]="''">Any {{'subregion'}}</mat-option>
-    <mat-option *ngFor="let value of subregions" [value]="value">{{value}}</mat-option>
-  </mat-select>
-</mat-form-field>
-
-<mat-form-field appearance="outline">
-  <mat-select [formControl]="form.controls.currencies" (selectionChange)="applyFilter('currencies', $event.value)" [value]="''">
-    <mat-option [value]="''">Any {{'currencies'}}</mat-option>
-    <mat-option *ngFor="let value of currencies" [value]="value">{{value}}</mat-option>
-  </mat-select>
-</mat-form-field>
-
-<mat-form-field appearance="outline">
-  <mat-select [formControl]="form.controls.languages" (selectionChange)="applyFilter('languages', $event.value)" [value]="''">
-    <mat-option [value]="''">Any {{'languages'}}</mat-option>
-    <mat-option *ngFor="let value of languages" [value]="value">{{value}}</mat-option>
-  </mat-select>
-</mat-form-field>
-
-<button *ngIf="dataSource.filter.length" mat-flat-button (click)="resetFilter()">Reset</button>
+<app-countries-filter [formOptions]="filterOptions"/>
 
 <div class="panel">
   <span>Showing {{dataSource.filteredData.length}} countries</span>
@@ -40,8 +15,8 @@
     <td mat-cell *matCellDef="let element">
       <ng-container [ngSwitch]="column">
         <ng-container *ngSwitchCase="'subregion'">
-          <ng-container *ngIf="element[column] as value">
-            <button mat-stroked-button color="primary" (click)="selectPill('subregion', value)">{{value}}</button>
+          <ng-container *ngIf="element[column] as item">
+            <button mat-stroked-button color="primary" (click)="selectPill('subregion', item)">{{item}}</button>
           </ng-container>
         </ng-container>
         <ng-container *ngSwitchCase="'currencies'">

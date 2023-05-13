@@ -10,8 +10,8 @@ import {
 import {Country} from '../../models/country';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSort} from '@angular/material/sort';
-import {FormBuilder} from '@angular/forms';
-import {CountriesTableService} from "./countries-table.service";
+import {CountriesTableService} from '../../services/countries-table.service';
+import {Filter, defaultFilterOptions, FilterOptions} from '../../models/filter';
 
 @Component({
   selector: 'app-countries-table',
@@ -22,75 +22,44 @@ import {CountriesTableService} from "./countries-table.service";
 })
 export class CountriesTableComponent implements AfterViewInit {
 
+  readonly columns = ['name', 'capital', 'subregion', 'currencies', 'languages'];
+
+  readonly dataSource = this.tableService.dataSource;
+
   @ViewChild(MatPaginator) private readonly paginator!: MatPaginator;
 
   @ViewChild(MatSort) private readonly sort!: MatSort;
 
   @Input({required: true}) set data(countries: Country[] | null) {
-    this.initData(countries || []);
-    if (countries !== null) {
-      this.loading = false;
-    }
+    this.initData(countries);
   }
 
   @Output() reset = new EventEmitter<void>();
 
-  readonly columns = ['name', 'capital', 'subregion', 'currencies', 'languages'];
-
-  readonly dataSource = this.tableService.dataSource;
-
-  readonly form = this.fb.group({
-    name: '',
-    subregion: '',
-    currencies: '',
-    languages: '',
-  });
-
-  subregions: string[] = [];
-  currencies: string[] = [];
-  languages: string[] = [];
+  filterOptions: FilterOptions  = defaultFilterOptions;
 
   loading = true;
 
-  constructor(
-    private fb: FormBuilder,
-    private tableService: CountriesTableService,
-  ) {}
+  constructor(private tableService: CountriesTableService) {}
 
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
 
-  private initData(data: Country[] = []) {
-    this.tableService.dataSource.data = data;
-    this.subregions = this.tableService.getFilterOptions('subregion');
-    this.currencies = this.tableService.getFilterOptions('currencies');
-    this.languages = this.tableService.getFilterOptions('languages');
-  }
-
-  applyFilter(name: string, value: string | null) {
-    this.tableService.applyFilter(name, value);
-  }
-
-  resetFilter() {
-    this.tableService.resetFilter();
-    this.form.reset({
-      name: '',
-      subregion: '',
-      currencies: '',
-      languages: '',
-    });
+  private initData(data: Country[] | null) {
+    this.loading = data === null;
+    this.tableService.dataSource.data = data || [];
+    this.filterOptions = this.tableService.getFilterOptions();
   }
 
   reload() {
     this.loading = true;
-    this.resetFilter();
+    this.tableService.resetFilter();
     this.reset.emit();
   }
 
-  selectPill(name: string, value: string) {
-    this.form.get(name)?.setValue(value);
-    this.applyFilter(name, value);
+  selectPill(name: keyof Filter, value: string) {
+    this.tableService.updateFilter(name, value);
   }
 }

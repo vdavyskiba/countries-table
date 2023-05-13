@@ -1,27 +1,43 @@
 import {Injectable} from '@angular/core';
-import {Country} from '../../models/country';
+import {Country} from '../models/country';
 import {MatTableDataSource} from "@angular/material/table";
+import {defaultFilter, Filter, FilterOptions} from "../models/filter";
+import {BehaviorSubject} from "rxjs";
 
 @Injectable()
 export class CountriesTableService {
 
   readonly dataSource = new MatTableDataSource<Country>([]);
 
-  constructor() {
-    this.dataSource.filterPredicate = this.initFilter();
+  private readonly _filter$ = new BehaviorSubject<Partial<Filter>>({...defaultFilter});
+
+  readonly filter$ = this._filter$.asObservable();
+
+  get hasFilter(): boolean {
+    return !!this.dataSource.filter.length;
   }
 
-  applyFilter(name: string, value: string | null) {
-    this.dataSource.filter = this.updateFilter(this.dataSource.filter, name, value);
+  constructor() {
+    this.dataSource.filterPredicate = this.filterPredicate();
+  }
+
+  updateFilter(name: keyof Filter, value: string) {
+    this._filter$.next({[name]: value});
+    this.applyFilter(name, value);
+  }
+
+  applyFilter(name: string, value: string) {
+    this.dataSource.filter = this.buildFilter(this.dataSource.filter, name, value);
     this.dataSource.paginator?.firstPage();
   }
 
   resetFilter() {
+    this._filter$.next({ ...defaultFilter });
     this.dataSource.filter = '';
     this.dataSource.paginator?.firstPage();
   }
 
-  private initFilter(): (data: Country, filterStr: string) => boolean {
+  private filterPredicate(): (data: Country, filterStr: string) => boolean {
 
     return (data, filterStr): boolean  => {
 
@@ -52,7 +68,16 @@ export class CountriesTableService {
     }
   }
 
-  getFilterOptions(prop: keyof Country): string[] {
+  getFilterOptions(): FilterOptions {
+    return {
+      name: [],
+      subregion: this.getFilterOption('subregion'),
+      currencies: this.getFilterOption('currencies'),
+      languages: this.getFilterOption('languages'),
+    };
+  }
+
+  private getFilterOption(prop: keyof Filter): string[] {
 
     const options: string[] = this.dataSource.data.map(item => {
       const value = item[prop];
@@ -62,7 +87,7 @@ export class CountriesTableService {
     return Array.from(new Set(options));
   }
 
-  private updateFilter(filterStr: string, name: string, rawValue: string | null): string {
+  private buildFilter(filterStr: string, name: string, rawValue: string | null): string {
 
     const filter = filterStr ? new Map(JSON.parse(filterStr)) : new Map();
 

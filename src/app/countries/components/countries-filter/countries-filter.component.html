@@ -1,0 +1,26 @@
+<mat-form-field appearance="outline" class="full-width">
+  <input [formControl]="form.controls.name" matInput (keyup)="applyFilter('name', form.controls.name.value)" placeholder="Search countries by name" />
+</mat-form-field>
+
+<mat-form-field appearance="outline">
+  <mat-select [formControl]="form.controls.subregion" (selectionChange)="applyFilter('subregion', $event.value)" [value]="''">
+    <mat-option [value]="''">Any {{'subregion'}}</mat-option>
+    <mat-option *ngFor="let value of formOptions.subregion" [value]="value">{{value}}</mat-option>
+  </mat-select>
+</mat-form-field>
+
+<mat-form-field appearance="outline">
+  <mat-select [formControl]="form.controls.currencies" (selectionChange)="applyFilter('currencies', $event.value)" [value]="''">
+    <mat-option [value]="''">Any {{'currencies'}}</mat-option>
+    <mat-option *ngFor="let value of formOptions.currencies" [value]="value">{{value}}</mat-option>
+  </mat-select>
+</mat-form-field>
+
+<mat-form-field appearance="outline">
+  <mat-select [formControl]="form.controls.languages" (selectionChange)="applyFilter('languages', $event.value)" [value]="''">
+    <mat-option [value]="''">Any {{'languages'}}</mat-option>
+    <mat-option *ngFor="let value of formOptions.languages" [value]="value">{{value}}</mat-option>
+  </mat-select>
+</mat-form-field>
+
+<button *ngIf="hasFilter" mat-flat-button (click)="resetFilter()">Reset</button>

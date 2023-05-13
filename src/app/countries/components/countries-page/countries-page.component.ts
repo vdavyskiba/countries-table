@@ -6,7 +6,7 @@ import { Country } from '../../models/country';
 @Component({
   selector: 'app-countries-page',
   templateUrl: './countries-page.component.html',
-  styleUrls: ['./countries-page.component.css'],
+  styleUrls: ['./countries-page.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CountriesPageComponent {
